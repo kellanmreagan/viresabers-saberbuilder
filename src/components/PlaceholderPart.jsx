@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import * as THREE from "three";
 import { classifyAccessory } from "../lib/catalog.js";
-import { partFit, realModel, PLACEHOLDER_MALE, STANDARD_THREAD_RADIUS } from "../lib/realModels.js";
+import { partFit, realModel, GHOST_MODELS, PLACEHOLDER_MALE, STANDARD_THREAD_RADIUS } from "../lib/realModels.js";
 import { resolveFinish } from "../lib/metal.js";
 import { partMotif } from "../lib/partMotif.js";
 import RealPart from "./RealPart.jsx";
@@ -373,6 +373,17 @@ export default function PlaceholderPart({
         partId={part.id}
         selected={selected}
         metalColor={part.selectedColor}
+        onSelect={() => onSelect?.(slot)}
+      />
+    );
+  }
+
+  if (ghost && GHOST_MODELS[slot]) {
+    return (
+      <RealPart
+        partId={GHOST_MODELS[slot]}
+        ghost
+        selected={selected}
         onSelect={() => onSelect?.(slot)}
       />
     );

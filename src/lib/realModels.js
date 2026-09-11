@@ -176,6 +176,13 @@ export const REAL_MODELS = {
   },
 };
 
+export const GHOST_MODELS = {
+  pommel: "rook-pommel",
+  grip: "throttle-grip",
+  switch: "rook-switch-usb-c",
+  emitter: "a-emitter-guardian-black",
+};
+
 const ASSET_BASE = import.meta.env.BASE_URL || "/";
 for (const spec of Object.values(REAL_MODELS)) {
   spec.url = `${ASSET_BASE}${String(spec.url).replace(/^\//, "")}`;
@@ -186,7 +193,7 @@ export function realModel(part) {
 }
 
 export function partFit(part, slot) {
-  const spec = realModel(part);
+  const spec = realModel(part) || (part ? null : REAL_MODELS[GHOST_MODELS[slot]]);
   if (spec) {
     const scale = spec.scale != null
       ? spec.scale

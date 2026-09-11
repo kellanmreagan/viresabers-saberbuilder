@@ -4,7 +4,7 @@ import * as THREE from "three";
 import { REAL_MODELS, partFit } from "../lib/realModels.js";
 import { resolveFinish } from "../lib/metal.js";
 
-export default function RealPart({ partId, selected = false, metalColor, onSelect }) {
+export default function RealPart({ partId, selected = false, metalColor, ghost = false, onSelect }) {
   const spec = REAL_MODELS[partId];
   const fit = partFit({ id: partId }, spec.slot);
   const gltf = useGLTF(spec.url);
@@ -18,28 +18,39 @@ export default function RealPart({ partId, selected = false, metalColor, onSelec
       child.geometry = child.geometry.clone();
       child.geometry.computeVertexNormals();
       const mat = child.material.clone();
-      mat.metalness = finish.metalness;
-      mat.roughness = Math.min(mat.roughness ?? 1, finish.roughness);
-      mat.envMapIntensity = 1.25;
-      if (spec.doubleSide) mat.side = THREE.DoubleSide;
-      const baked = spec.keepMap && mat.map && (!metalColor || metalColor === spec.bakedColor);
-      if (baked) {
-        mat.map.colorSpace = THREE.SRGBColorSpace;
-        mat.color = new THREE.Color(0xffffff);
-      } else if (metalColor) {
-        if (spec.solidRecolor && mat.map) {
-          mat.map = null;
-          mat.roughness = finish.roughness;
-          mat.metalness = finish.metalness;
+      if (ghost) {
+        mat.map = null;
+        mat.color = new THREE.Color("#9aa3ad");
+        mat.metalness = 0.55;
+        mat.roughness = 0.42;
+        mat.transparent = true;
+        mat.opacity = 0.28;
+        mat.depthWrite = false;
+        mat.envMapIntensity = 0.45;
+      } else {
+        mat.metalness = finish.metalness;
+        mat.roughness = Math.min(mat.roughness ?? 1, finish.roughness);
+        mat.envMapIntensity = 1.25;
+        const baked = spec.keepMap && mat.map && (!metalColor || metalColor === spec.bakedColor);
+        if (baked) {
+          mat.map.colorSpace = THREE.SRGBColorSpace;
+          mat.color = new THREE.Color(0xffffff);
+        } else if (metalColor) {
+          if (spec.solidRecolor && mat.map) {
+            mat.map = null;
+            mat.roughness = finish.roughness;
+            mat.metalness = finish.metalness;
+          }
+          mat.color = tint;
         }
-        mat.color = tint;
       }
+      if (spec.doubleSide) mat.side = THREE.DoubleSide;
       child.material = mat;
-      child.castShadow = true;
-      child.receiveShadow = true;
+      child.castShadow = !ghost;
+      child.receiveShadow = !ghost;
     });
     return root;
-  }, [gltf, finish.body, finish.metalness, finish.roughness, metalColor, spec]);
+  }, [gltf, finish.body, finish.metalness, finish.roughness, metalColor, spec, ghost]);
 
   return (
     <group
