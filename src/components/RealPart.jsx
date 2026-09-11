@@ -72,4 +72,4 @@ export default function RealPart({ partId, selected = false, metalColor, ghost =
   );
 }
 
-Object.values(REAL_MODELS).forEach((spec) => useGLTF.preload(spec.url));
+

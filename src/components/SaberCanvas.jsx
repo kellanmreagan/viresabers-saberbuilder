@@ -198,10 +198,12 @@ export default function SaberCanvas({
       {ignited && (build.blade || second?.blade) && (
         <pointLight position={[0, 0, 0]} intensity={2.2} color={bladeColor} distance={50} />
       )}
-      <CanvasErrorBoundary>
       <Suspense fallback={null}>
         <Environment preset="warehouse" />
-        <Bounds fit observe margin={1.45}>
+      </Suspense>
+      <CanvasErrorBoundary>
+      <Suspense fallback={null}>
+        <Bounds fit clip={false} observe margin={1.45}>
           {staff ? (
             <group>
               <group position={[0, -halfPommel, 0]}>
