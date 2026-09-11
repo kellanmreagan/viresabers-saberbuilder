@@ -71,7 +71,7 @@ export default function App() {
     const q = query.trim().toLowerCase();
     return getProducts(category).filter((p) => {
       if (stock === "in" && !p.available) return false;
-      if (realOnly && !realModel(p)) return false;
+      if (realOnly && category !== "blade" && !realModel(p)) return false;
       if (q && !p.title.toLowerCase().includes(q)) return false;
       return true;
     });
@@ -226,7 +226,7 @@ export default function App() {
     <div className="app">
       <header className="topbar">
         <a className="brand" href="https://viresabers.com" target="_blank" rel="noreferrer">
-          <img src="/logo.png" alt="Vire Sabers" />
+          <img src={`${import.meta.env.BASE_URL}logo.png`} alt="Vire Sabers" />
         </a>
         <div className="topbar-copy">
           <p className="kicker">Variable Hilt Components</p>
