@@ -1,4 +1,4 @@
-import { Suspense, useMemo, useRef } from "react";
+import { Component, Suspense, useMemo, useRef } from "react";
 import { Canvas } from "@react-three/fiber";
 import { Bounds, Environment, OrbitControls, PerspectiveCamera } from "@react-three/drei";
 import { EffectComposer, Bloom } from "@react-three/postprocessing";
@@ -86,6 +86,20 @@ function HiltStack({ hilt, electronics, bladeColor, activeSlot, onSelectSlot, si
       )}
     </group>
   );
+}
+
+class CanvasErrorBoundary extends Component {
+  constructor(props) {
+    super(props);
+    this.state = { error: null };
+  }
+  static getDerivedStateFromError(error) {
+    return { error };
+  }
+  render() {
+    if (this.state.error) return null;
+    return this.props.children;
+  }
 }
 
 function switchTop(hilt) {
@@ -184,6 +198,7 @@ export default function SaberCanvas({
       {ignited && (build.blade || second?.blade) && (
         <pointLight position={[0, 0, 0]} intensity={2.2} color={bladeColor} distance={50} />
       )}
+      <CanvasErrorBoundary>
       <Suspense fallback={null}>
         <Environment preset="warehouse" />
         <Bounds fit observe margin={1.45}>
@@ -267,6 +282,7 @@ export default function SaberCanvas({
           />
         )}
       </Suspense>
+      </CanvasErrorBoundary>
       <OrbitControls
         makeDefault
         enableDamping

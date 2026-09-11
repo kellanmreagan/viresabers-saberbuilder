@@ -176,6 +176,11 @@ export const REAL_MODELS = {
   },
 };
 
+const ASSET_BASE = import.meta.env.BASE_URL || "/";
+for (const spec of Object.values(REAL_MODELS)) {
+  spec.url = `${ASSET_BASE}${String(spec.url).replace(/^\//, "")}`;
+}
+
 export function realModel(part) {
   return part?.id ? REAL_MODELS[part.id] : null;
 }
