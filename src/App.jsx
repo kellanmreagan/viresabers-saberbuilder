@@ -414,7 +414,7 @@ export default function App() {
               return names.length ? `Real 3D: ${names.join(" · ")}` : "Placeholder 3D models";
             })()}
           </div>
-          <div className="stage-hint">Drag to rotate · Scroll to zoom · Right-drag to move</div>
+          <div className="stage-hint">Drag to rotate · Scroll to zoom</div>
           <div className="stage-tools">
             <label>
               Explode
