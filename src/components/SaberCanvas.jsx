@@ -1,6 +1,6 @@
 import { Component, Suspense, useMemo, useRef } from "react";
-import { Canvas } from "@react-three/fiber";
-import { Bounds, Environment, OrbitControls, PerspectiveCamera } from "@react-three/drei";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
+import { Environment, OrbitControls, PerspectiveCamera } from "@react-three/drei";
 import { EffectComposer, Bloom } from "@react-three/postprocessing";
 import PlaceholderPart, { partHeight } from "./PlaceholderPart.jsx";
 import { partFit } from "../lib/realModels.js";
@@ -33,6 +33,29 @@ function stackHilt(parts, extras, explode, includePommel) {
     plane += fit.stackHeight + gap;
   });
   return { items, len: Math.max(plane, 0.01) };
+}
+
+function centerStack(items) {
+  if (!items.length) return items;
+  let bottom = Infinity;
+  let top = -Infinity;
+  items.forEach((it) => {
+    bottom = Math.min(bottom, it.y);
+    top = Math.max(top, it.y + it.h);
+  });
+  const mid = (bottom + top) / 2;
+  return items.map((it) => ({ ...it, y: it.y - mid }));
+}
+
+function KeepOrbitCentered() {
+  const controls = useThree((s) => s.controls);
+  useFrame(() => {
+    if (!controls?.target) return;
+    if (controls.target.x !== 0 || controls.target.y !== 0 || controls.target.z !== 0) {
+      controls.target.set(0, 0, 0);
+    }
+  });
+  return null;
 }
 
 function decorateAccessories(hilt, extras) {
@@ -153,8 +176,7 @@ export default function SaberCanvas({
     const extras = build.extras || [];
     if (!doubleBladed) {
       const stacked = stackHilt(build, extras, explode, true);
-      const offset = -stacked.len / 2;
-      const hilt = stacked.items.map((it) => ({ ...it, y: it.y + offset }));
+      const hilt = centerStack(stacked.items);
       decorateAccessories(hilt, extras);
       return {
         mode: "single",
@@ -203,7 +225,6 @@ export default function SaberCanvas({
       </Suspense>
       <CanvasErrorBoundary>
       <Suspense fallback={null}>
-        <Bounds fit clip={false} observe margin={1.45}>
           {staff ? (
             <group>
               <group position={[0, -halfPommel, 0]}>
@@ -246,7 +267,6 @@ export default function SaberCanvas({
               side="a"
             />
           )}
-        </Bounds>
         {staff ? (
           <>
             <group position={[0, halfPommel, 0]}>
@@ -291,9 +311,10 @@ export default function SaberCanvas({
         dampingFactor={0.08}
         minDistance={1.2}
         maxDistance={140}
-        enablePan
+        enablePan={false}
         target={[0, 0, 0]}
       />
+      <KeepOrbitCentered />
       <EffectComposer>
         <Bloom
           intensity={ignited && (build.blade || second?.blade) ? 1.15 : 0.25}
