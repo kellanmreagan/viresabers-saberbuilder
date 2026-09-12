@@ -56,7 +56,7 @@ export default function App() {
   const [ignited, setIgnited] = useState(false);
   const [bladeColor, setBladeColor] = useState(BLADE_COLORS[0].hex);
   const [stock, setStock] = useState("all");
-  const [realOnly, setRealOnly] = useState(false);
+  const [realOnly, setRealOnly] = useState(true);
   const [doubleBladed, setDoubleBladed] = useState(false);
   const [second, setSecond] = useState(emptySecond);
   const [activeSaber, setActiveSaber] = useState("a");
